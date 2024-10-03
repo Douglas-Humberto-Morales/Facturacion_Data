@@ -28,7 +28,7 @@ public class StatusInvoiceService {
             .orElseThrow(() -> new RuntimeException("Status Invoice not found"));
     }
 
-    public Boolean existStatusInvoice(Integer id){
+    public boolean existStatusInvoice(Integer id){
         return statusInvoiceRepository.existsById(id);
     }
 
@@ -46,7 +46,8 @@ public class StatusInvoiceService {
     public StatusInvoiceDto updateStatusInvoice(StatusInvoiceDto statusInvoideDto, Integer id){
         StatusInvoice updateStatusInvoice = statusInvoiceRepository.findById(id).orElse(null);
         assert updateStatusInvoice != null;
-        updateStatusInvoice.setName(statusInvoideDto.getName());
+        statusInvoideDto.setStatudInvoiceId(id);
+        updateStatusInvoice = toModel(statusInvoideDto);
         return toDto(statusInvoiceRepository.save(updateStatusInvoice));
     }
 

@@ -32,15 +32,12 @@ public class Customer {
     private String name;
 
     @Column(name = "dpi")
-    @NotEmpty(message =  "The dpi is required")
     private String dpi;
     
     @Column(name = "passport")
-    @NotEmpty(message =  "The passport is required")
     private String passport;
     
     @Column(name = "nit")
-    @NotEmpty(message =  "The nit is required")
     private String nit;
     
     @Column(name = "address")

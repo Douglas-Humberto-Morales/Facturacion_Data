@@ -19,7 +19,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 @Entity
-@Table(name = "status_invoice")
+@Table(name = "payment_method")
 public class PaymentMethod {
 
     @Id
