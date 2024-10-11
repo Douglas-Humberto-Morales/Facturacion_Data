@@ -1,7 +1,5 @@
 package com.is4tech.invoicemanagement.controller;
 
-import java.util.List;
-
 import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
@@ -17,12 +15,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import com.is4tech.invoicemanagement.dto.CustomerDto;
 import com.is4tech.invoicemanagement.exception.ResourceNorFoundException;
 import com.is4tech.invoicemanagement.service.CustomerService;
 import com.is4tech.invoicemanagement.utils.Message;
+import com.is4tech.invoicemanagement.utils.MessagePage;
 
 @RestController
 @RequestMapping("/invoice-management/v0.1/")
@@ -37,10 +37,9 @@ public class CustomerController {
     private static final String ID_ENTITY = "customer_id";
 
     @GetMapping("/customers")
-    public ResponseEntity<Message> showAllCustomer (@PageableDefault(size = 10) Pageable pageable) {
-        List<CustomerDto> listCustomer = customerService.findByAllCustomer(pageable);
-        if (listCustomer.isEmpty())
-            throw new ResourceNorFoundException(NAME_ENTITY);
+    public ResponseEntity<Message> showAllCustomer (@PageableDefault(size = 10) Pageable pageable,
+        HttpServletRequest request) {
+        MessagePage listCustomer = customerService.findByAllCustomer(pageable, request);
 
         return new ResponseEntity<>(Message.builder()
                 .note("Records found")
@@ -50,8 +49,8 @@ public class CustomerController {
     }
 
     @GetMapping("/customer/{id}")
-    public ResponseEntity<Message> showByIdCustomer (@PathVariable Integer id) {
-        CustomerDto customerDto = customerService.findByIdCustomer(id);
+    public ResponseEntity<Message> showByIdCustomer (@PathVariable Integer id, HttpServletRequest request) {
+        CustomerDto customerDto = customerService.findByIdCustomer(id, request);
         if (customerDto == null)
             throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, id.toString());
 
@@ -63,11 +62,11 @@ public class CustomerController {
     }
 
     @PostMapping("/customer")
-    public ResponseEntity<Message> saveCustomer (@RequestBody @Valid CustomerDto customerDto)
-            throws BadRequestException {
+    public ResponseEntity<Message> saveCustomer (@RequestBody @Valid CustomerDto customerDto,
+        HttpServletRequest request) throws BadRequestException {
         try {
             customerDto.setStatus(true);
-            CustomerDto saveCustomer = customerService.saveCustomer(customerDto);
+            CustomerDto saveCustomer = customerService.saveCustomer(customerDto, request);
             return new ResponseEntity<>(Message.builder()
                     .note("Saved successfully")
                     .object(saveCustomer)
@@ -80,26 +79,31 @@ public class CustomerController {
 
     @PutMapping("/customer/{id}")
     public ResponseEntity<Message> updateCustomer(@RequestBody @Valid CustomerDto customerDto,
-            @PathVariable Integer id) throws BadRequestException {
+            @PathVariable Integer id, HttpServletRequest request) throws BadRequestException {
         try {
-            if (customerService.existCustomer(id)) {
-                CustomerDto updateCustomer = customerService.updateCustomer(customerDto, id);
-                return new ResponseEntity<>(Message.builder()
-                        .note("Saved successfully")
-                        .object(updateCustomer)
-                        .build(),
-                        HttpStatus.CREATED);
-            } else
+            if (!customerService.existCustomer(id)) {
                 throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, id.toString());
+            }
+            customerDto.setCustomerId(id);
+            CustomerDto customerUpdate = customerService.updateCustomer(customerDto, id, request);
+            return new ResponseEntity<>(Message.builder()
+                    .note("Update successfully")
+                    .object(customerUpdate)
+                    .build(), HttpStatus.OK);
+
         } catch (DataAccessException exDt) {
-            throw new BadRequestException("Error update record: " + exDt.getMessage());
+            throw new BadRequestException("Error updating record: " + exDt.getMessage());
+        } catch (Exception e) {
+            throw new BadRequestException("Unexpected error occurred: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/customer/{id}")
-    public ResponseEntity<Message> deleteCustomer (@PathVariable Integer id) throws BadRequestException {
+    public ResponseEntity<Message> deleteCustomer (@PathVariable Integer id,
+    HttpServletRequest request) throws BadRequestException {
         try {
-            customerService.deleteCustomer(id);
+            CustomerDto customerDto = customerService.findByIdCustomer(id, request);
+            customerService.deleteCustomer(customerDto, request);
             return new ResponseEntity<>(Message.builder()
                     .object(null)
                     .build(),

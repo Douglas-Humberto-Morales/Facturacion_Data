@@ -15,13 +15,13 @@ import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
 
-import java.util.List;
-
 import com.is4tech.invoicemanagement.dto.StatusInvoiceDto;
 import com.is4tech.invoicemanagement.exception.ResourceNorFoundException;
 import com.is4tech.invoicemanagement.service.StatusInvoiceService;
 import com.is4tech.invoicemanagement.utils.Message;
+import com.is4tech.invoicemanagement.utils.MessagePage;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
@@ -38,10 +38,9 @@ public class StatusInvoiceController {
     private static final String ID_ENTITY = "status_invoice_id";
 
     @GetMapping("/status-invoices")
-    public ResponseEntity<Message> showAllInvoiceStatements(@PageableDefault(size = 10) Pageable pageable) {
-        List<StatusInvoiceDto> listStatusInvoice = statusInvoiceService.listAllStatusInvoice(pageable);
-        if (listStatusInvoice.isEmpty())
-            throw new ResourceNorFoundException(NAME_ENTITY);
+    public ResponseEntity<Message> showAllInvoiceStatements(@PageableDefault(size = 10) Pageable pageable, 
+    HttpServletRequest request) {
+        MessagePage listStatusInvoice = statusInvoiceService.listAllStatusInvoice(pageable, request);
 
         return new ResponseEntity<>(Message.builder()
                 .note("Records found")
@@ -51,8 +50,8 @@ public class StatusInvoiceController {
     }
 
     @GetMapping("/status-invoice/{id}")
-    public ResponseEntity<Message> showByIdStatusInvoice(@PathVariable Integer id) {
-        StatusInvoiceDto statusInvoiceDto = statusInvoiceService.findByIdStatusInvoice(id);
+    public ResponseEntity<Message> showByIdStatusInvoice(@PathVariable Integer id, HttpServletRequest request) {
+        StatusInvoiceDto statusInvoiceDto = statusInvoiceService.findByIdStatusInvoice(id, request);
         if (statusInvoiceDto == null)
             throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, id.toString());
 
@@ -64,10 +63,10 @@ public class StatusInvoiceController {
     }
 
     @PostMapping("/status-invoice")
-    public ResponseEntity<Message> saveStatusInvoice(@RequestBody @Valid StatusInvoiceDto statusInvoiceDto)
-            throws BadRequestException {
+    public ResponseEntity<Message> saveStatusInvoice(@RequestBody @Valid StatusInvoiceDto statusInvoiceDto,
+        HttpServletRequest request) throws BadRequestException {
         try { 
-            StatusInvoiceDto saveStatusInvoiceDto = statusInvoiceService.saveStatusInvoice(statusInvoiceDto);
+            StatusInvoiceDto saveStatusInvoiceDto = statusInvoiceService.saveStatusInvoice(statusInvoiceDto, request);
             return new ResponseEntity<>(Message.builder()
                     .note("Saved successfully")
                     .object(saveStatusInvoiceDto)
@@ -80,32 +79,42 @@ public class StatusInvoiceController {
 
     @PutMapping("/status-invoice/{id}")
     public ResponseEntity<Message> updateStatusInvoice(@RequestBody @Valid StatusInvoiceDto statusInvoiceDto,
-            @PathVariable Integer id) throws BadRequestException {
+            @PathVariable Integer id, HttpServletRequest request) throws BadRequestException {
+        StatusInvoiceDto statusInvoice = null;
         try {
-            if (statusInvoiceService.existStatusInvoice(id)) {
-                StatusInvoiceDto updateStatusInvoiceDto = statusInvoiceService.updateStatusInvoice(statusInvoiceDto, id);
-                return new ResponseEntity<>(Message.builder()
-                        .note("Saved successfully")
-                        .object(updateStatusInvoiceDto)
-                        .build(),
-                        HttpStatus.CREATED);
-            } else
+            if (!statusInvoiceService.existStatusInvoice(id)) {
                 throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, id.toString());
+            }
+            statusInvoiceDto.setStatudInvoiceId(id);
+            statusInvoice = statusInvoiceService.updateStatusInvoice(id, statusInvoiceDto, request);
+            return new ResponseEntity<>(Message.builder()
+                    .note("Saved successfully")
+                    .object(statusInvoice)
+                    .build(),
+                    HttpStatus.CREATED);
         } catch (DataAccessException exDt) {
-            throw new BadRequestException("Error update record: " + exDt.getMessage());
+            throw new BadRequestException("Error updating record: " + exDt.getMessage());
+        } catch (Exception e) {
+            throw new BadRequestException("Unexpected error occurred: " + e.getMessage());
         }
     }
 
     @DeleteMapping("/status-invoice/{id}")
-    public ResponseEntity<Message> deleteStatusInvoice(@PathVariable Integer id) throws BadRequestException {
+    public ResponseEntity<Message> deleteStatusInvoice(@PathVariable Integer id, 
+    HttpServletRequest request)throws BadRequestException {
         try {
-            statusInvoiceService.deleteStatusInvoice(id);
+            StatusInvoiceDto statusInvoiceDto = statusInvoiceService.findByIdStatusInvoice(id, request);
+            statusInvoiceService.deleteStatusInvoice(statusInvoiceDto, request);
             return new ResponseEntity<>(Message.builder()
                     .object(null)
                     .build(),
                     HttpStatus.NO_CONTENT);
-        } catch (DataAccessException exDt) {
-            throw new BadRequestException("Error delete record: " + exDt.getMessage());
+        } catch (ResourceNorFoundException e) {
+            throw new BadRequestException("Rol not found: " + e.getMessage());
+        } catch (DataAccessException e) {
+            throw new BadRequestException("Error deleting record: " + e.getMessage());
+        } catch (Exception e) {
+            throw new BadRequestException("Unexpected error occurred: " + e.getMessage());
         }
     }
 }
