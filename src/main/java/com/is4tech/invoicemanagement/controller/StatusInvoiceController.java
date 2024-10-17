@@ -25,7 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/invoice-management/v0.1")
+@RequestMapping("/invoice-management/v0.1/status-invoice")
 public class StatusInvoiceController {
 
     private final StatusInvoiceService statusInvoiceService;
@@ -37,7 +37,7 @@ public class StatusInvoiceController {
     private static final String NAME_ENTITY = "Status Invoice";
     private static final String ID_ENTITY = "status_invoice_id";
 
-    @GetMapping("/status-invoices")
+    @GetMapping("/show-all")
     public ResponseEntity<Message> showAllInvoiceStatements(@PageableDefault(size = 10) Pageable pageable, 
     HttpServletRequest request) {
         MessagePage listStatusInvoice = statusInvoiceService.listAllStatusInvoice(pageable, request);
@@ -49,7 +49,7 @@ public class StatusInvoiceController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/status-invoice/{id}")
+    @GetMapping("/show-by-id/{id}")
     public ResponseEntity<Message> showByIdStatusInvoice(@PathVariable Integer id, HttpServletRequest request) {
         StatusInvoiceDto statusInvoiceDto = statusInvoiceService.findByIdStatusInvoice(id, request);
         if (statusInvoiceDto == null)
@@ -62,7 +62,7 @@ public class StatusInvoiceController {
                 HttpStatus.OK);
     }
 
-    @PostMapping("/status-invoice")
+    @PostMapping("/create")
     public ResponseEntity<Message> saveStatusInvoice(@RequestBody @Valid StatusInvoiceDto statusInvoiceDto,
         HttpServletRequest request) throws BadRequestException {
         try { 
@@ -77,7 +77,7 @@ public class StatusInvoiceController {
         }
     }
 
-    @PutMapping("/status-invoice/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Message> updateStatusInvoice(@RequestBody @Valid StatusInvoiceDto statusInvoiceDto,
             @PathVariable Integer id, HttpServletRequest request) throws BadRequestException {
         StatusInvoiceDto statusInvoice = null;
@@ -99,7 +99,7 @@ public class StatusInvoiceController {
         }
     }
 
-    @DeleteMapping("/status-invoice/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Message> deleteStatusInvoice(@PathVariable Integer id, 
     HttpServletRequest request)throws BadRequestException {
         try {

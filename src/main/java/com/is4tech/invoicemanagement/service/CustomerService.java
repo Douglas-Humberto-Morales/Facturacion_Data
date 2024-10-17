@@ -25,7 +25,6 @@ public class CustomerService {
 
     public MessagePage findByAllCustomer(Pageable pageable, HttpServletRequest request){
         Page<Customer> listAllCustomer = customerRepository.findAll(pageable);
-
         /*
         if(listAllCustomer.isEmpty()){
             int statusCode = HttpStatus.NOT_FOUND.value();

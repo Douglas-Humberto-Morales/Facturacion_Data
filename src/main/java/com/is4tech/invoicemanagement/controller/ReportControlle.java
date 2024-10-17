@@ -22,7 +22,7 @@ import com.is4tech.invoicemanagement.utils.MessagePage;
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
-@RequestMapping("/invoide-management/v0.1/report")
+@RequestMapping("/invoice-management/v0.1/report")
 public class ReportControlle {
     private final ReportService reportService;
 
@@ -50,7 +50,7 @@ public class ReportControlle {
         @PathVariable Integer id, HttpServletRequest request){
         ReportDto reportDto = reportService.findByIdReport(id, request);
         return new ResponseEntity<>(Message.builder()
-            .note("Records found")
+            .note("Record found: " + ID_ENTITY)
             .object(reportDto)
             .build(),
             HttpStatus.OK);
@@ -63,13 +63,13 @@ public class ReportControlle {
             ReportDto reportDtoSave = reportService.saveReport(reportDto, request);
             statusCode = HttpStatus.CREATED.value();
             return new ResponseEntity<>(Message.builder()
-                .note("Records found")
+                .note("Record create")
                 .object(reportDtoSave)
                 .build(),
                 HttpStatus.OK);
         } catch (DataAccessException e) {
             statusCode = HttpStatus.BAD_REQUEST.value();
-            throw new BadRequestException("Error saving record: " + e.getMessage());
+            throw new BadRequestException("Error saving record: " + NAME_ENTITY + e.getMessage());
         } catch (ResourceNorFoundException e) {
             statusCode = HttpStatus.NOT_FOUND.value();
             throw e;

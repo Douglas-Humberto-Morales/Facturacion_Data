@@ -25,7 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/invoice-management/v0.1/")
+@RequestMapping("/invoice-management/v0.1/payment-method")
 public class PaymentMethodController {
     private final PaymentMethodService paymentMethodService;
 
@@ -36,7 +36,7 @@ public class PaymentMethodController {
     private static final String NAME_ENTITY = "Payment Method";
     private static final String ID_ENTITY = "payment_method_id";
 
-    @GetMapping("/payment-methods")
+    @GetMapping("/show-all")
     public ResponseEntity<Message> showAllInvoiceStatements(@PageableDefault(size = 10) Pageable pageable,
         HttpServletRequest request) {
         MessagePage listPaymentMethod = paymentMethodService.findByAllPaymentMethod(pageable, request);
@@ -48,7 +48,7 @@ public class PaymentMethodController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/payment-method/{id}")
+    @GetMapping("/show-by-id/{id}")
     public ResponseEntity<Message> showByIdPaymentMethod (@PathVariable Integer id, HttpServletRequest request) {
         PaymentMethodDto paymentMethodDto = paymentMethodService.findByIdPaymentMethodDto(id, request);
         if (paymentMethodDto == null)
@@ -61,7 +61,7 @@ public class PaymentMethodController {
                 HttpStatus.OK);
     }
 
-    @PostMapping("/payment-method")
+    @PostMapping("/create")
     public ResponseEntity<Message> savePaymentMethod(@RequestBody @Valid PaymentMethodDto paymentMethodDto,
         HttpServletRequest request) throws BadRequestException {
         try {
@@ -76,7 +76,7 @@ public class PaymentMethodController {
         }
     }
 
-    @PutMapping("/payment-method/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Message> updatePaymentMethod(@RequestBody @Valid PaymentMethodDto paymentMethodDto,
             @PathVariable Integer id, HttpServletRequest request) throws BadRequestException {
         PaymentMethodDto updatePaymentMethodDto = null;
@@ -98,7 +98,7 @@ public class PaymentMethodController {
         }
     }
 
-    @DeleteMapping("/payment-method/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Message> deletePaymentMethod(@PathVariable Integer id, 
     HttpServletRequest request) throws BadRequestException {
         try {

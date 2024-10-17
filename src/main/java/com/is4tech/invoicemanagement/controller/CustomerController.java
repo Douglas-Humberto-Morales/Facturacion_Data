@@ -25,7 +25,7 @@ import com.is4tech.invoicemanagement.utils.Message;
 import com.is4tech.invoicemanagement.utils.MessagePage;
 
 @RestController
-@RequestMapping("/invoice-management/v0.1/")
+@RequestMapping("/invoice-management/v0.1/customer")
 public class CustomerController {
     private final CustomerService customerService;
 
@@ -36,7 +36,7 @@ public class CustomerController {
     private static final String NAME_ENTITY = "Customer";
     private static final String ID_ENTITY = "customer_id";
 
-    @GetMapping("/customers")
+    @GetMapping("/show-all")
     public ResponseEntity<Message> showAllCustomer (@PageableDefault(size = 10) Pageable pageable,
         HttpServletRequest request) {
         MessagePage listCustomer = customerService.findByAllCustomer(pageable, request);
@@ -48,7 +48,7 @@ public class CustomerController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/customer/{id}")
+    @GetMapping("/show-by-id/{id}")
     public ResponseEntity<Message> showByIdCustomer (@PathVariable Integer id, HttpServletRequest request) {
         CustomerDto customerDto = customerService.findByIdCustomer(id, request);
         if (customerDto == null)
@@ -61,7 +61,7 @@ public class CustomerController {
                 HttpStatus.OK);
     }
 
-    @PostMapping("/customer")
+    @PostMapping("/createa")
     public ResponseEntity<Message> saveCustomer (@RequestBody @Valid CustomerDto customerDto,
         HttpServletRequest request) throws BadRequestException {
         try {
@@ -77,7 +77,7 @@ public class CustomerController {
         }
     }
 
-    @PutMapping("/customer/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Message> updateCustomer(@RequestBody @Valid CustomerDto customerDto,
             @PathVariable Integer id, HttpServletRequest request) throws BadRequestException {
         try {
@@ -98,7 +98,7 @@ public class CustomerController {
         }
     }
 
-    @DeleteMapping("/customer/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Message> deleteCustomer (@PathVariable Integer id,
     HttpServletRequest request) throws BadRequestException {
         try {
