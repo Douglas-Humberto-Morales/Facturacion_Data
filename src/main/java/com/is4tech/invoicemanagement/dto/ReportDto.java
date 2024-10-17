@@ -16,7 +16,6 @@ import lombok.Setter;
 @Builder
 public class ReportDto {
 
-    @JsonIgnore
     private Integer noOrdered;
 
     @NotNull(message = "Amount is required")

@@ -57,7 +57,7 @@ public class ProductService {
                 .deliveryTime(productDto.getDelivery_time())
                 .description(productDto.getDescription())
                 .price(productDto.getPrice())
-                .status(productDto.getStatus())
+                .status((productDto.getStatus() != null) ? productDto.getStatus() : true)
                 .companyOrBrandName(productDto.getCompanyOrBrandName())
                 .expirationDate(productDto.getExpirationDate())
                 .entryDate(productDto.getEntryDate())

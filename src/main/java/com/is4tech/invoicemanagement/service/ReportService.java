@@ -95,7 +95,7 @@ public class ReportService {
 
     private Report toModelReport(ReportDto reportDto){
         Customer customer = customerRepository.findById(reportDto.getCustomerId())
-        .orElseThrow(() -> new ResourceNorFoundException("Profile not found"));
+        .orElseThrow(() -> new ResourceNorFoundException("Customer not found"));
         return Report.builder()
             .noOrdered(reportDto.getNoOrdered())
             .amount(reportDto.getAmount())

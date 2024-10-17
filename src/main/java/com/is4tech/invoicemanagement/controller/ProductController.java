@@ -3,7 +3,6 @@ package com.is4tech.invoicemanagement.controller;
 import com.is4tech.invoicemanagement.dto.ProductDto;
 import com.is4tech.invoicemanagement.exception.BadRequestException;
 import com.is4tech.invoicemanagement.exception.ResourceNorFoundException;
-import com.is4tech.invoicemanagement.service.CustomerService;
 import com.is4tech.invoicemanagement.service.ProductService;
 import com.is4tech.invoicemanagement.utils.Message;
 import jakarta.validation.Valid;
@@ -16,19 +15,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/invoice-management/v0.1/")
+@RequestMapping("/invoice-management/v0.1/product")
 public class ProductController {
 
     private final ProductService productService;
 
-    public ProductController(ProductService productService, CustomerService customerService) {
+    public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
     private static final String NAME_ENTITY = "Product";
     private static final String ID_ENTITY = "products_id";
 
-    @GetMapping("/products")
+    @GetMapping("/show-all")
     public ResponseEntity<Message> showAllProducts(Pageable pageable) {
         List<ProductDto> listProducts = productService.findByAllProducts(pageable);
         if (listProducts.isEmpty())
@@ -41,7 +40,7 @@ public class ProductController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/products/{id}")
+    @GetMapping("/show-by-id/{id}")
     public ResponseEntity<Message> showProductById(@PathVariable Integer id) {
         ProductDto productDto = productService.findByIdProduct(id);
 
@@ -56,7 +55,7 @@ public class ProductController {
 
     }
 
-    @PostMapping("/product")
+    @PostMapping("/create")
     public ResponseEntity<Message> saveProduct(@RequestBody ProductDto productDto) throws BadRequestException {
         try {
             ProductDto saveProduct = productService.save(productDto);
@@ -70,7 +69,7 @@ public class ProductController {
         }
     }
 
-    @PutMapping("/update-product/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Message> updateProduct(@PathVariable Integer id, @RequestBody @Valid ProductDto productDto) throws BadRequestException {
         try {
             if (productService.existProduct(id)) {
@@ -87,7 +86,7 @@ public class ProductController {
         }
     }
 
-    @DeleteMapping("/delete-product/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Message> deleteProduct(@PathVariable Integer id) throws BadRequestException {
         try {
             if (productService.existProduct(id)) {

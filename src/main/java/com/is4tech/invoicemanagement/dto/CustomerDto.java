@@ -12,7 +12,6 @@ import lombok.Setter;
 @Setter
 @Builder
 public class CustomerDto {
-    @JsonIgnore
     private Integer customerId;
     @NotEmpty(message = "Name is required")
     @NotBlank(message = "Name not blank")

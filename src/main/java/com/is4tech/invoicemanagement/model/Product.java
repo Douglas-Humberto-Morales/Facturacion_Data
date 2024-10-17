@@ -35,7 +35,7 @@ public class Product {
     private Double price;
 
     @Column(name = "status")
-    private Boolean status = true;
+    private Boolean status;
 
     @Column(name = "company_or_brand_name", length = 75)
     private String companyOrBrandName;

@@ -15,7 +15,6 @@ import lombok.Setter;
 @Builder
 public class PaymentMethodDto {
     
-    @JsonIgnore
     private Integer paymentMethodId;
     @NotEmpty(message = "Name is required")
     @NotBlank(message = "Name not blank")

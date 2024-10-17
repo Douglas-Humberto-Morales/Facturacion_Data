@@ -25,7 +25,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/invoice-management/v0.1/")
+@RequestMapping("/invoice-management/v0.1/detail-invoice-product")
 public class DetailInvoiceProductsController {
     private final DetailInvoiceProductsService detailInvoiceProductsService;
 
@@ -36,7 +36,7 @@ public class DetailInvoiceProductsController {
     private static final String NAME_ENTITY = "Detail Invoice Products";
     private static final String ID_ENTITY = "detail_invoice_products_id";
 
-    @GetMapping("/details-invoice-products")
+    @GetMapping("/show-all")
     public ResponseEntity<Message> showAllDetailInvoiceProducts(@PageableDefault(size = 10) Pageable pageable,
             HttpServletRequest request) {
         MessagePage listDetailInvoiceProducts = detailInvoiceProductsService
@@ -49,7 +49,7 @@ public class DetailInvoiceProductsController {
                 HttpStatus.OK);
     }
 
-    @GetMapping("/detail-invoice-products/{id}")
+    @GetMapping("/show-by-id/{id}")
     public ResponseEntity<Message> showByIdDetailInvoiceProducts(@PathVariable Integer id,
     HttpServletRequest request) {
         DetailInvoiceProductsDto detailInvoiceProductsDto = detailInvoiceProductsService
@@ -64,7 +64,7 @@ public class DetailInvoiceProductsController {
                 HttpStatus.OK);
     }
 
-    @PostMapping("/detail-invoice-products")
+    @PostMapping("/create")
     public ResponseEntity<Message> saveDetailInvoiceProducts(
             @RequestBody @Valid DetailInvoiceProductsDto detailInvoiceProductsDto,
             HttpServletRequest request) throws BadRequestException {
@@ -81,7 +81,7 @@ public class DetailInvoiceProductsController {
         }
     }
 
-    @PutMapping("/detail-invoice-products/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Message> updateDetailInvoiceProducts(
             @RequestBody @Valid DetailInvoiceProductsDto detailInvoiceProductsDto,
             @PathVariable Integer id, HttpServletRequest request) throws BadRequestException {
@@ -108,7 +108,7 @@ public class DetailInvoiceProductsController {
         }
     }
 
-    @DeleteMapping("/detail-invoice-products/{id}")
+    @DeleteMapping("/delete/{id}")
     public ResponseEntity<Message> deleteDetailInvoiceProducts(@PathVariable Integer id,
     HttpServletRequest request) throws BadRequestException {
         try {
