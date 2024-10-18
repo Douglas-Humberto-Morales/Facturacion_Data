@@ -1,34 +1,40 @@
 package com.is4tech.invoicemanagement.dto;
 
-import com.is4tech.invoicemanagement.model.Customer;
-import com.is4tech.invoicemanagement.model.PaymentMethod;
-import com.is4tech.invoicemanagement.model.StatusInvoice;
-import lombok.*;
+import java.util.Date;
 
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
 public class InvoiceDto {
+
     private Integer invoiceId;
 
-    private LocalDateTime creationDate;
+    @JsonIgnore
+    private Date creationDate;
 
-    private Double discount;
+    private Integer discount;
 
+    @NotNull(message = "El subTotal es obligatorio")
     private Double subtotal;
 
+    @NotNull(message = "El total completo es obligatorio")
     private Double total;
 
-    private String namePaymentMethod;
+    @NotNull(message = "El metodo de pago es obligatorio")
+    private Integer paymentMethodId;
 
-    private String name;
+    @NotNull(message = "El cliente es obligatorio")
+    private Integer customer;
 
-    private String nameStatus;
+    private Integer statusInvoiceId;
 
+    @NotNull(message = "El usuario del registro es obligatorio")
     private Integer userId;
-    private String fullName;
 }
