@@ -12,15 +12,15 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @Builder
 @Entity
 @Table(name = "report")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Report {
 
     @Id
