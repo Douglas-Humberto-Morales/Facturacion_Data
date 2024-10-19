@@ -2,8 +2,6 @@ package com.is4tech.invoicemanagement.dto;
 
 import org.springframework.format.annotation.NumberFormat;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;

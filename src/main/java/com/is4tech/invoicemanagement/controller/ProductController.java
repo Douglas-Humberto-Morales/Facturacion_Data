@@ -5,14 +5,14 @@ import com.is4tech.invoicemanagement.exception.BadRequestException;
 import com.is4tech.invoicemanagement.exception.ResourceNorFoundException;
 import com.is4tech.invoicemanagement.service.ProductService;
 import com.is4tech.invoicemanagement.utils.Message;
+import com.is4tech.invoicemanagement.utils.MessagePage;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/invoice-management/v0.1/product")
@@ -28,16 +28,23 @@ public class ProductController {
     private static final String ID_ENTITY = "products_id";
 
     @GetMapping("/show-all")
-    public ResponseEntity<Message> showAllProducts(Pageable pageable) {
-        List<ProductDto> listProducts = productService.findByAllProducts(pageable);
-        if (listProducts.isEmpty())
-            throw new ResourceNorFoundException(NAME_ENTITY);
+    public ResponseEntity<MessagePage> showAllProducts(Pageable pageable) {
+        Page<ProductDto> productPage = productService.findByAllProducts(pageable);
 
-        return new ResponseEntity<>(Message.builder()
+        if (productPage.isEmpty()) {
+            throw new ResourceNorFoundException("No products found");
+        }
+
+        MessagePage message = MessagePage.builder()
                 .note("Records Found")
-                .object(listProducts)
-                .build(),
-                HttpStatus.OK);
+                .object(productPage.getContent())
+                .totalElements((int) productPage.getTotalElements())
+                .totalPages(productPage.getTotalPages())
+                .currentPage(productPage.getNumber())
+                .pageSize(productPage.getSize())
+                .build();
+
+        return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
     @GetMapping("/show-by-id/{id}")
