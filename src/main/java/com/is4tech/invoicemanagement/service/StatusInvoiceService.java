@@ -1,5 +1,7 @@
 package com.is4tech.invoicemanagement.service;
 
+import java.util.List;
+
 import org.apache.coyote.BadRequestException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,13 +30,12 @@ public class StatusInvoiceService {
 
         Page<StatusInvoice> listAllStatusInvoice = statusInvoiceRepository.findAll(pageable);
 
-        /*
         if(listAllStatusInvoice.isEmpty()){
-            int statusCode = HttpStatus.NOT_FOUND.value();
-            auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
+            //int statusCode = HttpStatus.NOT_FOUND.value();
+            //auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
             throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, pageable.toString());
         }
-
+        /*
         int statusCode = HttpStatus.OK.value();
         auditService.logAudit(listAllStatusInvoice.getContent(), this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
         */
@@ -47,6 +48,25 @@ public class StatusInvoiceService {
             .currentPage(listAllStatusInvoice.getNumber())
             .pageSize(listAllStatusInvoice.getSize())
             .build();
+    }
+
+    public List<StatusInvoiceDto> findByAllPaymentMethodNotPageable(){
+
+        List<StatusInvoiceDto> listAllStatusInvoice = statusInvoiceRepository.findAll().stream()
+            .map(this::toDto).toList();
+
+        if(listAllStatusInvoice.isEmpty()){
+            //int statusCode = HttpStatus.NOT_FOUND.value();
+            //auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
+            throw new ResourceNorFoundException(NAME_ENTITY);
+        }
+
+        /*
+        int statusCode = HttpStatus.OK.value();
+        auditService.logAudit(listAllStatusInvoice.getContent(), this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
+        */
+
+        return listAllStatusInvoice;
     }
 
     public StatusInvoiceDto findByIdStatusInvoice(Integer id, HttpServletRequest request){

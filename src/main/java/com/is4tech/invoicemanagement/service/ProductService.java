@@ -4,6 +4,7 @@ import com.is4tech.invoicemanagement.dto.ProductDto;
 import com.is4tech.invoicemanagement.model.Product;
 import com.is4tech.invoicemanagement.repository.ProductRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -14,10 +15,9 @@ import java.util.List;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    public List<ProductDto> findByAllProducts(Pageable pageable) {
-        return productRepository.findAll(pageable).stream()
-                .map(this::toDto)
-                .toList();
+    public Page<ProductDto> findByAllProducts(Pageable pageable) {
+        return productRepository.findAll(pageable)
+                .map(this::toDto);
     }
 
     public ProductDto findByIdProduct(Integer id) {

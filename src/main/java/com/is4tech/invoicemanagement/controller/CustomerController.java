@@ -1,5 +1,7 @@
 package com.is4tech.invoicemanagement.controller;
 
+import java.util.List;
+
 import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
@@ -111,5 +113,17 @@ public class CustomerController {
         } catch (DataAccessException exDt) {
             throw new BadRequestException("Error delete record: " + exDt.getMessage());
         }
+    }
+
+    @GetMapping("/show-all-not-pageable")
+    public ResponseEntity<Message> showAllCustomerNotPag (@PageableDefault(size = 10) Pageable pageable,
+        HttpServletRequest request) {
+        List<CustomerDto> listCustomer = customerService.findByAllCustomerNotPageable();
+
+        return new ResponseEntity<>(Message.builder()
+                .note("Records found")
+                .object(listCustomer)
+                .build(),
+                HttpStatus.OK);
     }
 }

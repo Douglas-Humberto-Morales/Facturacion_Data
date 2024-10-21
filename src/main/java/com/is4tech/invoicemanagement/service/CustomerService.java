@@ -1,5 +1,7 @@
 package com.is4tech.invoicemanagement.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -25,13 +27,13 @@ public class CustomerService {
 
     public MessagePage findByAllCustomer(Pageable pageable, HttpServletRequest request){
         Page<Customer> listAllCustomer = customerRepository.findAll(pageable);
-        /*
+        
         if(listAllCustomer.isEmpty()){
-            int statusCode = HttpStatus.NOT_FOUND.value();
-            auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
+            //int statusCode = HttpStatus.NOT_FOUND.value();
+            //auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
             throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, pageable.toString());
         }
-
+        /*
         int statusCode = HttpStatus.OK.value();
         auditService.logAudit(listAllCustomer.getContent(), this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
         */
@@ -44,6 +46,23 @@ public class CustomerService {
             .currentPage(listAllCustomer.getNumber())
             .pageSize(listAllCustomer.getSize())
             .build();
+    }
+
+    public List<CustomerDto> findByAllCustomerNotPageable(){
+        List<CustomerDto> listAllCustomer = customerRepository.findAll().stream()
+            .map(this::toDto).toList();
+        
+        if(listAllCustomer.isEmpty()){
+            //int statusCode = HttpStatus.NOT_FOUND.value();
+            //auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
+            throw new ResourceNorFoundException(NAME_ENTITY);
+        }
+        /*
+        int statusCode = HttpStatus.OK.value();
+        auditService.logAudit(listAllCustomer.getContent(), this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
+        */
+
+        return listAllCustomer;
     }
 
     public CustomerDto findByIdCustomer(Integer id, HttpServletRequest request){

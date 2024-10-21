@@ -11,10 +11,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
 import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
 
+import com.is4tech.invoicemanagement.dto.PaymentMethodDto;
 import com.is4tech.invoicemanagement.dto.StatusInvoiceDto;
 import com.is4tech.invoicemanagement.exception.ResourceNorFoundException;
 import com.is4tech.invoicemanagement.service.StatusInvoiceService;
@@ -116,5 +120,16 @@ public class StatusInvoiceController {
         } catch (Exception e) {
             throw new BadRequestException("Unexpected error occurred: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/show-all-not-pageable")
+    public ResponseEntity<Message> showAllStatusInvoiceNotPag () {
+        List<StatusInvoiceDto> listStatusInvoice = statusInvoiceService.findByAllPaymentMethodNotPageable();
+
+        return new ResponseEntity<>(Message.builder()
+                .note("Records found")
+                .object(listStatusInvoice)
+                .build(),
+                HttpStatus.OK);
     }
 }

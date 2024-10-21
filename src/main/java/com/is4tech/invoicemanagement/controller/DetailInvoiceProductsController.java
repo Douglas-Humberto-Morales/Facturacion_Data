@@ -1,5 +1,8 @@
 package com.is4tech.invoicemanagement.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
@@ -40,7 +43,7 @@ public class DetailInvoiceProductsController {
     public ResponseEntity<Message> showAllDetailInvoiceProducts(@PageableDefault(size = 10) Pageable pageable,
             HttpServletRequest request) {
         MessagePage listDetailInvoiceProducts = detailInvoiceProductsService
-                .findByDetailInvoiceProduct(pageable, request);
+                .findByDetailInvoiceProduct(pageable);
 
         return new ResponseEntity<>(Message.builder()
                 .note("Records found")
@@ -53,7 +56,7 @@ public class DetailInvoiceProductsController {
     public ResponseEntity<Message> showByIdDetailInvoiceProducts(@PathVariable Integer id,
     HttpServletRequest request) {
         DetailInvoiceProductsDto detailInvoiceProductsDto = detailInvoiceProductsService
-                .findByIdDetailInvoiceProducts(id, request);
+                .findByIdDetailInvoiceProducts(id);
         if (detailInvoiceProductsDto == null)
             throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, id.toString());
 
@@ -66,67 +69,25 @@ public class DetailInvoiceProductsController {
 
     @PostMapping("/create")
     public ResponseEntity<Message> saveDetailInvoiceProducts(
-            @RequestBody @Valid DetailInvoiceProductsDto detailInvoiceProductsDto,
+            @RequestBody @Valid List<DetailInvoiceProductsDto> detailInvoiceProductsDtos,
             HttpServletRequest request) throws BadRequestException {
         try {
-            DetailInvoiceProductsDto saveDetailInvoiceProductsDto = detailInvoiceProductsService
-                    .saveDetailInvoiceProducts(detailInvoiceProductsDto, request);
+            List<DetailInvoiceProductsDto> savedDetails = new ArrayList<>();
+
+            for (DetailInvoiceProductsDto detailInvoiceProductsDto : detailInvoiceProductsDtos) {
+                DetailInvoiceProductsDto savedDetail = detailInvoiceProductsService
+                        .saveDetailInvoiceProducts(detailInvoiceProductsDto, request);
+                savedDetails.add(savedDetail);
+            }
+
             return new ResponseEntity<>(Message.builder()
-                    .note("Saved successfully")
-                    .object(saveDetailInvoiceProductsDto)
+                    .note("All records saved successfully")
+                    .object(savedDetails)
                     .build(),
                     HttpStatus.CREATED);
         } catch (DataAccessException exDt) {
-            throw new BadRequestException("Error save record: " + exDt.getMessage());
+            throw new BadRequestException("Error saving records: " + exDt.getMessage());
         }
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Message> updateDetailInvoiceProducts(
-            @RequestBody @Valid DetailInvoiceProductsDto detailInvoiceProductsDto,
-            @PathVariable Integer id, HttpServletRequest request) throws BadRequestException {
-        DetailInvoiceProductsDto detailInvoiceProducts = null;
-        try {
-            if (!detailInvoiceProductsService.existDetailInvoiceProducts(id)) {
-                throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, id.toString());
-            }
-
-            detailInvoiceProductsDto.setDetailInvoiceProductsId(id);
-
-            detailInvoiceProducts = detailInvoiceProductsService
-            .updateDetailInvoiceProducts(detailInvoiceProductsDto, id, request);
-
-            return new ResponseEntity<>(Message.builder()
-                    .note("Update successfully")
-                    .object(detailInvoiceProducts)
-                    .build(), HttpStatus.OK);
-
-        } catch (DataAccessException exDt) {
-            throw new BadRequestException("Error updating record: " + exDt.getMessage());
-        } catch (Exception e) {
-            throw new BadRequestException("Unexpected error occurred: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Message> deleteDetailInvoiceProducts(@PathVariable Integer id,
-    HttpServletRequest request) throws BadRequestException {
-        try {
-            DetailInvoiceProductsDto detailInvoiceProducts = detailInvoiceProductsService
-            .findByIdDetailInvoiceProducts(id, request);
-            detailInvoiceProductsService.deleteDetailInvoiceProduct(detailInvoiceProducts, request);
-
-            return new ResponseEntity<>(Message.builder()
-                    .object(null)
-                    .build(),
-                    HttpStatus.NO_CONTENT);
-
-        } catch (ResourceNorFoundException e) {
-            throw new BadRequestException("Rol not found: " + e.getMessage());
-        } catch (DataAccessException e) {
-            throw new BadRequestException("Error deleting record: " + e.getMessage());
-        } catch (Exception e) {
-            throw new BadRequestException("Unexpected error occurred: " + e.getMessage());
-        }
-    }
 }

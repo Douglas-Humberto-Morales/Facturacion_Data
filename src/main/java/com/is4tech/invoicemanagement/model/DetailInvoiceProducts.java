@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -31,4 +33,11 @@ public class DetailInvoiceProducts {
 
     @Column(name = "price")
     private Double price;
+
+    @Column(name = "amount")
+    private Integer amount;
+
+    @ManyToOne
+    @JoinColumn(name = "invoice_id", referencedColumnName = "invoice_id")
+    private Invoice invoice;
 }
