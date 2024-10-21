@@ -49,6 +49,9 @@ public class ReportControlle {
     public ResponseEntity<Message> showByIdReports(
         @PathVariable Integer id, HttpServletRequest request){
         ReportDto reportDto = reportService.findByIdReport(id, request);
+        if (reportDto == null) {
+            throw new ResourceNorFoundException("Report not found with id: " + id);
+        }
         return new ResponseEntity<>(Message.builder()
             .note("Record found: " + ID_ENTITY)
             .object(reportDto)
