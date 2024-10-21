@@ -22,6 +22,5 @@ public class CustomerDto {
     @NotEmpty(message = "Address is required")
     @NotBlank(message = "Address not blank")
     private String address;
-    @JsonIgnore
     private Boolean status;
 }

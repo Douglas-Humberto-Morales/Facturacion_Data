@@ -150,6 +150,17 @@ public class CustomerService {
         }
     }
 
+    public List<CustomerDto> findByName(String name) {
+        List<Customer> customers = customerRepository.findByNameContainingIgnoreCase(name);
+        
+        if (customers.isEmpty()) {
+            throw new ResourceNorFoundException(NAME_ENTITY);
+        }
+        
+        return customers.stream().map(this::toDto).toList();
+    }
+    
+
     private Customer toModel(CustomerDto customerDto){
         return Customer.builder()
             .customerId(customerDto.getCustomerId())

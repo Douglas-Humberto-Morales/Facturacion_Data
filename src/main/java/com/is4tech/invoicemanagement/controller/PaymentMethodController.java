@@ -57,7 +57,7 @@ public class PaymentMethodController {
             throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, id.toString());
 
         return new ResponseEntity<>(Message.builder()
-                .note("Records found")
+                .note("Record found")
                 .object(paymentMethodDto)
                 .build(),
                 HttpStatus.OK);
@@ -111,7 +111,7 @@ public class PaymentMethodController {
                     .build(),
                     HttpStatus.NO_CONTENT);
         } catch (ResourceNorFoundException e) {
-            throw new BadRequestException("Rol not found: " + e.getMessage());
+            throw new BadRequestException("Payment Method not found: " + e.getMessage());
         } catch (DataAccessException e) {
             throw new BadRequestException("Error deleting record: " + e.getMessage());
         } catch (Exception e) {

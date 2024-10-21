@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
 import com.is4tech.invoicemanagement.dto.CustomerDto;
+import com.is4tech.invoicemanagement.dto.NameSearchDto;
 import com.is4tech.invoicemanagement.exception.ResourceNorFoundException;
 import com.is4tech.invoicemanagement.service.CustomerService;
 import com.is4tech.invoicemanagement.utils.Message;
@@ -39,8 +40,8 @@ public class CustomerController {
     private static final String ID_ENTITY = "customer_id";
 
     @GetMapping("/show-all")
-    public ResponseEntity<Message> showAllCustomer (@PageableDefault(size = 10) Pageable pageable,
-        HttpServletRequest request) {
+    public ResponseEntity<Message> showAllCustomer(@PageableDefault(size = 10) Pageable pageable,
+            HttpServletRequest request) {
         MessagePage listCustomer = customerService.findByAllCustomer(pageable, request);
 
         return new ResponseEntity<>(Message.builder()
@@ -51,21 +52,21 @@ public class CustomerController {
     }
 
     @GetMapping("/show-by-id/{id}")
-    public ResponseEntity<Message> showByIdCustomer (@PathVariable Integer id, HttpServletRequest request) {
+    public ResponseEntity<Message> showByIdCustomer(@PathVariable Integer id, HttpServletRequest request) {
         CustomerDto customerDto = customerService.findByIdCustomer(id, request);
         if (customerDto == null)
             throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, id.toString());
 
         return new ResponseEntity<>(Message.builder()
-                .note("Records found")
+                .note("Record found")
                 .object(customerDto)
                 .build(),
                 HttpStatus.OK);
     }
 
     @PostMapping("/createa")
-    public ResponseEntity<Message> saveCustomer (@RequestBody @Valid CustomerDto customerDto,
-        HttpServletRequest request) throws BadRequestException {
+    public ResponseEntity<Message> saveCustomer(@RequestBody @Valid CustomerDto customerDto,
+            HttpServletRequest request) throws BadRequestException {
         try {
             customerDto.setStatus(true);
             CustomerDto saveCustomer = customerService.saveCustomer(customerDto, request);
@@ -101,8 +102,8 @@ public class CustomerController {
     }
 
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Message> deleteCustomer (@PathVariable Integer id,
-    HttpServletRequest request) throws BadRequestException {
+    public ResponseEntity<Message> deleteCustomer(@PathVariable Integer id,
+            HttpServletRequest request) throws BadRequestException {
         try {
             CustomerDto customerDto = customerService.findByIdCustomer(id, request);
             customerService.deleteCustomer(customerDto, request);
@@ -116,8 +117,8 @@ public class CustomerController {
     }
 
     @GetMapping("/show-all-not-pageable")
-    public ResponseEntity<Message> showAllCustomerNotPag (@PageableDefault(size = 10) Pageable pageable,
-        HttpServletRequest request) {
+    public ResponseEntity<Message> showAllCustomerNotPag(@PageableDefault(size = 10) Pageable pageable,
+            HttpServletRequest request) {
         List<CustomerDto> listCustomer = customerService.findByAllCustomerNotPageable();
 
         return new ResponseEntity<>(Message.builder()
@@ -126,4 +127,16 @@ public class CustomerController {
                 .build(),
                 HttpStatus.OK);
     }
+
+    @PostMapping("/search-by-name")
+    public ResponseEntity<Message> searchCustomerByName(@RequestBody NameSearchDto nameSearchDto, HttpServletRequest request) {
+        List<CustomerDto> listCustomer = customerService.findByName(nameSearchDto.getName());
+
+        return new ResponseEntity<>(Message.builder()
+                .note("Records found")
+                .object(listCustomer)
+                .build(),
+                HttpStatus.OK);
+    }
+
 }
