@@ -1,5 +1,7 @@
 package com.is4tech.invoicemanagement.service;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -26,13 +28,13 @@ public class PaymentMethodService {
     public MessagePage findByAllPaymentMethod(Pageable pageable, HttpServletRequest request){
         Page<PaymentMethod> listAllPaymentMethod = paymentMethodRepository.findAll(pageable);
 
-        /*
+        
         if(listAllPaymentMethod.isEmpty()){
-            int statusCode = HttpStatus.NOT_FOUND.value();
-            auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
-            throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, pageable.toString());
+            //int statusCode = HttpStatus.NOT_FOUND.value();
+            //auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
+            throw new ResourceNorFoundException(NAME_ENTITY);
         }
-
+        /*
         int statusCode = HttpStatus.OK.value();
         auditService.logAudit(listAllPaymentMethod.getContent(), this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
         */
@@ -45,6 +47,24 @@ public class PaymentMethodService {
             .currentPage(listAllPaymentMethod.getNumber())
             .pageSize(listAllPaymentMethod.getSize())
             .build();
+    }
+
+    public List<PaymentMethodDto> findByAllPaymentMethodNotPageable(){
+        List<PaymentMethodDto> listAllPaymentMethod = paymentMethodRepository.findAll().stream()
+            .map(this::toDto).toList();
+
+        
+        if(listAllPaymentMethod.isEmpty()){
+            //int statusCode = HttpStatus.NOT_FOUND.value();
+            //auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
+            throw new ResourceNorFoundException(NAME_ENTITY);
+        }
+        /*
+        int statusCode = HttpStatus.OK.value();
+        auditService.logAudit(listAllPaymentMethod.getContent(), this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
+        */
+
+        return listAllPaymentMethod;
     }
 
     public PaymentMethodDto findByIdPaymentMethodDto(Integer id, HttpServletRequest request){

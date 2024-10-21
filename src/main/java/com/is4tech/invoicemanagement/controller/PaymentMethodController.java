@@ -1,5 +1,7 @@
 package com.is4tech.invoicemanagement.controller;
 
+import java.util.List;
+
 import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
@@ -115,5 +117,16 @@ public class PaymentMethodController {
         } catch (Exception e) {
             throw new BadRequestException("Unexpected error occurred: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/show-all-not-pageable")
+    public ResponseEntity<Message> showAllPaymentMethodNotPag () {
+        List<PaymentMethodDto> listPaymentMethod = paymentMethodService.findByAllPaymentMethodNotPageable();
+
+        return new ResponseEntity<>(Message.builder()
+                .note("Records found")
+                .object(listPaymentMethod)
+                .build(),
+                HttpStatus.OK);
     }
 }
