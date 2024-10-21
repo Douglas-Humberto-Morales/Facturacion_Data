@@ -1,7 +1,6 @@
 package com.is4tech.invoicemanagement.service;
 
-import java.util.List;
-
+import com.is4tech.invoicemanagement.utils.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,8 @@ import com.is4tech.invoicemanagement.utils.MessagePage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class PaymentMethodService {
@@ -28,13 +29,13 @@ public class PaymentMethodService {
     public MessagePage findByAllPaymentMethod(Pageable pageable, HttpServletRequest request){
         Page<PaymentMethod> listAllPaymentMethod = paymentMethodRepository.findAll(pageable);
 
-        
-        if(listAllPaymentMethod.isEmpty()){
-            //int statusCode = HttpStatus.NOT_FOUND.value();
-            //auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
-            throw new ResourceNorFoundException(NAME_ENTITY);
-        }
         /*
+        if(listAllPaymentMethod.isEmpty()){
+            int statusCode = HttpStatus.NOT_FOUND.value();
+            auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
+            throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, pageable.toString());
+        }
+
         int statusCode = HttpStatus.OK.value();
         auditService.logAudit(listAllPaymentMethod.getContent(), this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
         */
@@ -49,22 +50,15 @@ public class PaymentMethodService {
             .build();
     }
 
-    public List<PaymentMethodDto> findByAllPaymentMethodNotPageable(){
-        List<PaymentMethodDto> listAllPaymentMethod = paymentMethodRepository.findAll().stream()
-            .map(this::toDto).toList();
+    public Message findAllPaymentMethods() {
+        List<PaymentMethod> listAllProducts = paymentMethodRepository.findAll();
 
-        
-        if(listAllPaymentMethod.isEmpty()){
-            //int statusCode = HttpStatus.NOT_FOUND.value();
-            //auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
-            throw new ResourceNorFoundException(NAME_ENTITY);
-        }
-        /*
-        int statusCode = HttpStatus.OK.value();
-        auditService.logAudit(listAllPaymentMethod.getContent(), this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
-        */
+        Message message = new Message();
 
-        return listAllPaymentMethod;
+        message.setNote("All Payment methods Retrieved Successfully");
+        message.setObject(listAllProducts.stream().map(this::toDto).toList());
+
+        return message;
     }
 
     public PaymentMethodDto findByIdPaymentMethodDto(Integer id, HttpServletRequest request){

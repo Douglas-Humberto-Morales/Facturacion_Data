@@ -1,7 +1,5 @@
 package com.is4tech.invoicemanagement.controller;
 
-import java.util.List;
-
 import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +23,8 @@ import com.is4tech.invoicemanagement.utils.MessagePage;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/invoice-management/v0.1/payment-method")
@@ -50,6 +50,19 @@ public class PaymentMethodController {
                 HttpStatus.OK);
     }
 
+    @GetMapping("/show-all-payment-methods")
+    public ResponseEntity<Message> showAllPaymentMethods() {
+        Message listPaymentMethods = paymentMethodService.findAllPaymentMethods();
+
+        return new ResponseEntity<>(
+                Message.builder()
+                        .note("Records found")
+                        .object(listPaymentMethods.getObject())
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
     @GetMapping("/show-by-id/{id}")
     public ResponseEntity<Message> showByIdPaymentMethod (@PathVariable Integer id, HttpServletRequest request) {
         PaymentMethodDto paymentMethodDto = paymentMethodService.findByIdPaymentMethodDto(id, request);
@@ -57,7 +70,7 @@ public class PaymentMethodController {
             throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, id.toString());
 
         return new ResponseEntity<>(Message.builder()
-                .note("Record found")
+                .note("Records found")
                 .object(paymentMethodDto)
                 .build(),
                 HttpStatus.OK);
@@ -111,22 +124,11 @@ public class PaymentMethodController {
                     .build(),
                     HttpStatus.NO_CONTENT);
         } catch (ResourceNorFoundException e) {
-            throw new BadRequestException("Payment Method not found: " + e.getMessage());
+            throw new BadRequestException("Rol not found: " + e.getMessage());
         } catch (DataAccessException e) {
             throw new BadRequestException("Error deleting record: " + e.getMessage());
         } catch (Exception e) {
             throw new BadRequestException("Unexpected error occurred: " + e.getMessage());
         }
-    }
-
-    @GetMapping("/show-all-not-pageable")
-    public ResponseEntity<Message> showAllPaymentMethodNotPag () {
-        List<PaymentMethodDto> listPaymentMethod = paymentMethodService.findByAllPaymentMethodNotPageable();
-
-        return new ResponseEntity<>(Message.builder()
-                .note("Records found")
-                .object(listPaymentMethod)
-                .build(),
-                HttpStatus.OK);
     }
 }

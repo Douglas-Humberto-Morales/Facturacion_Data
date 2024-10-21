@@ -1,7 +1,6 @@
 package com.is4tech.invoicemanagement.service;
 
-import java.util.List;
-
+import com.is4tech.invoicemanagement.utils.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -17,6 +16,8 @@ import com.is4tech.invoicemanagement.utils.MessagePage;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class CustomerService {
@@ -27,13 +28,13 @@ public class CustomerService {
 
     public MessagePage findByAllCustomer(Pageable pageable, HttpServletRequest request){
         Page<Customer> listAllCustomer = customerRepository.findAll(pageable);
-        
+        /*
         if(listAllCustomer.isEmpty()){
-            //int statusCode = HttpStatus.NOT_FOUND.value();
-            //auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
+            int statusCode = HttpStatus.NOT_FOUND.value();
+            auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
             throw new ResourceNorFoundException(NAME_ENTITY, ID_ENTITY, pageable.toString());
         }
-        /*
+
         int statusCode = HttpStatus.OK.value();
         auditService.logAudit(listAllCustomer.getContent(), this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
         */
@@ -48,21 +49,15 @@ public class CustomerService {
             .build();
     }
 
-    public List<CustomerDto> findByAllCustomerNotPageable(){
-        List<CustomerDto> listAllCustomer = customerRepository.findAll().stream()
-            .map(this::toDto).toList();
-        
-        if(listAllCustomer.isEmpty()){
-            //int statusCode = HttpStatus.NOT_FOUND.value();
-            //auditService.logAudit(null, this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
-            throw new ResourceNorFoundException(NAME_ENTITY);
-        }
-        /*
-        int statusCode = HttpStatus.OK.value();
-        auditService.logAudit(listAllCustomer.getContent(), this.getClass().getMethods()[0], null, statusCode, NAME_ENTITY, request);
-        */
+    public Message findAllCustomers() {
+        List<Customer> listAllCustomers = customerRepository.findAll();
 
-        return listAllCustomer;
+        Message message = new Message();
+
+        message.setNote("All Customers Retrieved Successfully");
+        message.setObject(listAllCustomers.stream().map(this::toDto).toList());
+
+        return message;
     }
 
     public CustomerDto findByIdCustomer(Integer id, HttpServletRequest request){
@@ -150,16 +145,25 @@ public class CustomerService {
         }
     }
 
-    public List<CustomerDto> findByName(String name) {
-        List<Customer> customers = customerRepository.findByNameContainingIgnoreCase(name);
-        
+    public Page<CustomerDto> findByName(String name, Pageable pageable) {
+        Page<Customer> customers = customerRepository.findByNameContainingIgnoreCase(name, pageable);
+
         if (customers.isEmpty()) {
             throw new ResourceNorFoundException(NAME_ENTITY);
         }
-        
-        return customers.stream().map(this::toDto).toList();
+
+        return customers.map(this::toDto);
     }
-    
+
+    public Customer toggleCustomerStatus(Integer userId) {
+        Customer customer = customerRepository.findById(userId).orElseThrow(() -> new ResourceNorFoundException("User not found"));
+
+        customer.setStatus(!customer.getStatus());
+
+        customerRepository.save(customer);
+
+        return customer;
+    }
 
     private Customer toModel(CustomerDto customerDto){
         return Customer.builder()

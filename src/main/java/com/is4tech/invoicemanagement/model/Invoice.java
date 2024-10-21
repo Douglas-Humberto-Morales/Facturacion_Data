@@ -39,6 +39,9 @@ public class Invoice {
     @Column(name = "total")
     private Double total;
 
+    @Column(name = "total_taxes")
+    private Double totalTaxes;
+
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "payment_method_id")
     @JsonBackReference
@@ -53,7 +56,6 @@ public class Invoice {
     @JoinColumn(name = "status_invoice_id")
     @JsonBackReference
     private StatusInvoice statusInvoice;
-
 
     @Column(name = "user_id")
     private Integer userId;

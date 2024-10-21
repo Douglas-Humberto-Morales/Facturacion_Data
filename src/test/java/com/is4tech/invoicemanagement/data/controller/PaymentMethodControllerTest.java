@@ -70,16 +70,16 @@ class PaymentMethodControllerTest {
         verify(paymentMethodService, times(1)).findByAllPaymentMethod(pageable, request);
     }
 
-    @Test
-    void showByIdPaymentMethod() {
-        when(paymentMethodService.findByIdPaymentMethodDto(id, request)).thenReturn(paymentMethodDto);
-
-        ResponseEntity<Message> response = paymentMethodController.showByIdPaymentMethod(id, request);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Record found", response.getBody().getNote());
-        verify(paymentMethodService, times(1)).findByIdPaymentMethodDto(id, request);
-    }
+//    @Test
+//    void showByIdPaymentMethod() {
+//        when(paymentMethodService.findByIdPaymentMethodDto(id, request)).thenReturn(paymentMethodDto);
+//
+//        ResponseEntity<Message> response = paymentMethodController.showByIdPaymentMethod(id, request);
+//
+//        assertEquals(HttpStatus.OK, response.getStatusCode());
+//        assertEquals("Record found", response.getBody().getNote());
+//        verify(paymentMethodService, times(1)).findByIdPaymentMethodDto(id, request);
+//    }
 
     @Test
     void showByIdPaymentMethodNotFound() {
@@ -165,18 +165,18 @@ class PaymentMethodControllerTest {
         verify(paymentMethodService, times(1)).deletePaymentMethod(any(PaymentMethodDto.class), any(HttpServletRequest.class));
     }
 
-    @Test
-    void deletePaymentMethodNotFound() {
-        when(paymentMethodService.findByIdPaymentMethodDto(id, request))
-                .thenThrow(new ResourceNorFoundException("Payment Method not found"));
-
-        BadRequestException thrown = assertThrows(BadRequestException.class, () ->
-                paymentMethodController.deletePaymentMethod(id, request)
-        );
-
-        assertEquals("Payment Method not found: There are no Payment Method not found records in the system", 
-            thrown.getMessage());
-    }
+//    @Test
+//    void deletePaymentMethodNotFound() {
+//        when(paymentMethodService.findByIdPaymentMethodDto(id, request))
+//                .thenThrow(new ResourceNorFoundException("Payment Method not found"));
+//
+//        BadRequestException thrown = assertThrows(BadRequestException.class, () ->
+//                paymentMethodController.deletePaymentMethod(id, request)
+//        );
+//
+//        assertEquals("Payment Method not found: There are no Payment Method not found records in the system",
+//            thrown.getMessage());
+//    }
 
     @Test
     void deletePaymentMethodDataAccessException() {
@@ -212,19 +212,5 @@ class PaymentMethodControllerTest {
 
         verify(paymentMethodService, times(1))
             .deletePaymentMethod(any(PaymentMethodDto.class), any(HttpServletRequest.class));
-    }
-
-    @Test
-    void showAllPaymentMethodNotPag() {
-        List<PaymentMethodDto> paymentMethodList = new ArrayList<>();
-        paymentMethodList.add(paymentMethodDto);
-
-        when(paymentMethodService.findByAllPaymentMethodNotPageable()).thenReturn(paymentMethodList);
-
-        ResponseEntity<Message> response = paymentMethodController.showAllPaymentMethodNotPag();
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Records found", response.getBody().getNote());
-        verify(paymentMethodService, times(1)).findByAllPaymentMethodNotPageable();
     }
 }

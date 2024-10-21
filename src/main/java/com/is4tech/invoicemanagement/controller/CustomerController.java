@@ -2,8 +2,10 @@ package com.is4tech.invoicemanagement.controller;
 
 import java.util.List;
 
+import com.is4tech.invoicemanagement.model.Customer;
 import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataAccessException;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -49,6 +51,19 @@ public class CustomerController {
                 .object(listCustomer)
                 .build(),
                 HttpStatus.OK);
+    }
+
+    @GetMapping("/show-all-customers")
+    public ResponseEntity<Message> showAllCustomer() {
+        Message listCustomer = customerService.findAllCustomers();
+
+        return new ResponseEntity<>(
+                Message.builder()
+                        .note("Records found")
+                        .object(listCustomer.getObject())
+                        .build(),
+                HttpStatus.OK
+        );
     }
 
     @GetMapping("/show-by-id/{id}")
@@ -116,27 +131,34 @@ public class CustomerController {
         }
     }
 
-    @GetMapping("/show-all-not-pageable")
-    public ResponseEntity<Message> showAllCustomerNotPag(@PageableDefault(size = 10) Pageable pageable,
-            HttpServletRequest request) {
-        List<CustomerDto> listCustomer = customerService.findByAllCustomerNotPageable();
-
-        return new ResponseEntity<>(Message.builder()
-                .note("Records found")
-                .object(listCustomer)
-                .build(),
-                HttpStatus.OK);
-    }
-
     @PostMapping("/search-by-name")
-    public ResponseEntity<Message> searchCustomerByName(@RequestBody NameSearchDto nameSearchDto, HttpServletRequest request) {
-        List<CustomerDto> listCustomer = customerService.findByName(nameSearchDto.getName());
+    public ResponseEntity<MessagePage> searchCustomerByName(
+            @RequestBody CustomerDto customerDto,
+            HttpServletRequest request, Pageable pageable) {
 
-        return new ResponseEntity<>(Message.builder()
+        Page<CustomerDto> customerPage = customerService.findByName(customerDto.getName(), pageable);
+
+        return new ResponseEntity<>(MessagePage.builder()
                 .note("Records found")
-                .object(listCustomer)
+                .object(customerPage.getContent())
+                .totalElements((int) customerPage.getTotalElements())
+                .totalPages(customerPage.getTotalPages())
+                .currentPage(customerPage.getNumber())
+                .pageSize(customerPage.getSize())
                 .build(),
                 HttpStatus.OK);
     }
 
+    @PutMapping("/toggle-status/{id}")
+    public ResponseEntity<Customer> toggleCustomerStatus(@PathVariable Integer id, HttpServletRequest request) {
+        try {
+            Customer updatedCustomer = customerService.toggleCustomerStatus(id);
+
+            return new ResponseEntity<>(updatedCustomer, HttpStatus.OK);
+        } catch (ResourceNorFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new com.is4tech.invoicemanagement.exception.BadRequestException("Error" + e.getMessage());
+        }
+    }
 }

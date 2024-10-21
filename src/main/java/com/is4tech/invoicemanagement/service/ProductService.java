@@ -1,8 +1,11 @@
 package com.is4tech.invoicemanagement.service;
 
 import com.is4tech.invoicemanagement.dto.ProductDto;
+import com.is4tech.invoicemanagement.exception.ResourceNorFoundException;
+import com.is4tech.invoicemanagement.model.Customer;
 import com.is4tech.invoicemanagement.model.Product;
 import com.is4tech.invoicemanagement.repository.ProductRepository;
+import com.is4tech.invoicemanagement.utils.Message;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,10 +17,22 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private static final String NAME_ENTITY = "Product";
 
     public Page<ProductDto> findByAllProducts(Pageable pageable) {
         return productRepository.findAll(pageable)
                 .map(this::toDto);
+    }
+
+    public Message findAllProducts() {
+        List<Product> listAllProducts = productRepository.findAll();
+
+        Message message = new Message();
+
+        message.setNote("All Products Retrieved Successfully");
+        message.setObject(listAllProducts.stream().map(this::toDto).toList());
+
+        return message;
     }
 
     public ProductDto findByIdProduct(Integer id) {
@@ -47,6 +62,26 @@ public class ProductService {
         productDto.setProductsId(id);
         updateProduct = toModel(productDto);
         return toDto(productRepository.save(updateProduct));
+    }
+
+    public Page<ProductDto> findByName(String name, Pageable pageable) {
+        Page<Product> products = productRepository.findByNameContainingIgnoreCase(name, pageable);
+
+        if (products.isEmpty()) {
+            throw new ResourceNorFoundException(NAME_ENTITY);
+        }
+
+        return products.map(this::toDto);
+    }
+
+    public Product toggleProductStatus(Integer userId) {
+        Product product = productRepository.findById(userId).orElseThrow(() -> new ResourceNorFoundException("User not found"));
+
+        product.setStatus(!product.getStatus());
+
+        productRepository.save(product);
+
+        return product;
     }
 
     private Product toModel(ProductDto productDto) {

@@ -1,11 +1,15 @@
 package com.is4tech.invoicemanagement.controller;
 
+import com.is4tech.invoicemanagement.dto.CustomerDto;
 import com.is4tech.invoicemanagement.dto.ProductDto;
 import com.is4tech.invoicemanagement.exception.BadRequestException;
 import com.is4tech.invoicemanagement.exception.ResourceNorFoundException;
+import com.is4tech.invoicemanagement.model.Customer;
+import com.is4tech.invoicemanagement.model.Product;
 import com.is4tech.invoicemanagement.service.ProductService;
 import com.is4tech.invoicemanagement.utils.Message;
 import com.is4tech.invoicemanagement.utils.MessagePage;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Page;
@@ -45,6 +49,19 @@ public class ProductController {
                 .build();
 
         return new ResponseEntity<>(message, HttpStatus.OK);
+    }
+
+    @GetMapping("/show-all-products")
+    public ResponseEntity<Message> showAllProducts() {
+        Message listProducts = productService.findAllProducts();
+
+        return new ResponseEntity<>(
+                Message.builder()
+                        .note("Records found")
+                        .object(listProducts.getObject())
+                        .build(),
+                HttpStatus.OK
+        );
     }
 
     @GetMapping("/show-by-id/{id}")
@@ -108,6 +125,37 @@ public class ProductController {
             }
         } catch (DataAccessException e) {
             throw new BadRequestException("Error delete record: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/search-by-name")
+    public ResponseEntity<MessagePage> searchProductByName(
+            @RequestBody ProductDto productDto,
+            HttpServletRequest request, Pageable pageable) {
+
+        Page<ProductDto> productPage = productService.findByName(productDto.getName(), pageable);
+
+        return new ResponseEntity<>(MessagePage.builder()
+                .note("Records found")
+                .object(productPage.getContent())
+                .totalElements((int) productPage.getTotalElements())
+                .totalPages(productPage.getTotalPages())
+                .currentPage(productPage.getNumber())
+                .pageSize(productPage.getSize())
+                .build(),
+                HttpStatus.OK);
+    }
+
+    @PutMapping("/toggle-status/{id}")
+    public ResponseEntity<Product> toggleProductStatus(@PathVariable Integer id, HttpServletRequest request) {
+        try {
+            Product updatedProduct = productService.toggleProductStatus(id);
+
+            return new ResponseEntity<>(updatedProduct, HttpStatus.OK);
+        } catch (ResourceNorFoundException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new com.is4tech.invoicemanagement.exception.BadRequestException("Error" + e.getMessage());
         }
     }
 }

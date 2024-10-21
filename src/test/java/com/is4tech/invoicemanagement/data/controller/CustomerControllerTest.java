@@ -193,18 +193,4 @@ class CustomerControllerTest {
         verify(customerService, times(1))
                 .deleteCustomer(any(CustomerDto.class), any(HttpServletRequest.class));
     }
-
-    @Test
-    void showAllCustomerNotPageable() {
-        List<CustomerDto> customerList = new ArrayList<>();
-        customerList.add(customerDto);
-
-        when(customerService.findByAllCustomerNotPageable()).thenReturn(customerList);
-
-        ResponseEntity<Message> response = customerController.showAllCustomerNotPag(PageRequest.of(0, 10), request);
-
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals("Records found", response.getBody().getNote());
-        verify(customerService, times(1)).findByAllCustomerNotPageable();
-    }
 }
