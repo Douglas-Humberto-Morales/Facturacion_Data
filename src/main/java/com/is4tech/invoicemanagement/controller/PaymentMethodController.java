@@ -1,5 +1,6 @@
 package com.is4tech.invoicemanagement.controller;
 
+import com.is4tech.invoicemanagement.model.Customer;
 import org.apache.coyote.BadRequestException;
 import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,8 @@ import com.is4tech.invoicemanagement.utils.MessagePage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/invoice-management/v0.1/payment-method")
 public class PaymentMethodController {
@@ -46,6 +49,19 @@ public class PaymentMethodController {
                 .object(listPaymentMethod)
                 .build(),
                 HttpStatus.OK);
+    }
+
+    @GetMapping("/show-all-payment-methods")
+    public ResponseEntity<Message> showAllPaymentMethods() {
+        Message listPaymentMethods = paymentMethodService.findAllPaymentMethods();
+
+        return new ResponseEntity<>(
+                Message.builder()
+                        .note("Records found")
+                        .object(listPaymentMethods.getObject())
+                        .build(),
+                HttpStatus.OK
+        );
     }
 
     @GetMapping("/show-by-id/{id}")

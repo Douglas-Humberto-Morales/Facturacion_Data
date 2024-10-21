@@ -55,12 +55,15 @@ public class InvoiceService {
         //Pendiente
     }
 
+    private
+
     private InvoiceDto toDto(Invoice invoice){
         return InvoiceDto.builder()
                 .invoiceId(invoice.getInvoiceId())
                 .creationDate(invoice.getCreationDate())
                 .subtotal(invoice.getSubtotal())
                 .total(invoice.getTotal())
+                .totalTaxes(invoice.getTotalTaxes())
                 .paymentMethodId(invoice.getPaymentMethod().getPaymentMethodId())
                 .customer(invoice.getCustomer().getCustomerId())
                 .statusInvoiceId(invoice.getStatusInvoice().getStatusInvoiceId())
@@ -80,6 +83,7 @@ public class InvoiceService {
                 .creationDate(invoiceDto.getCreationDate())
                 .subtotal(invoiceDto.getSubtotal())
                 .total(invoiceDto.getTotal())
+                .totalTaxes(invoiceDto.getTotalTaxes())
                 .paymentMethod(paymentMethod)
                 .customer(customer)
                 .statusInvoice(statusInvoice)

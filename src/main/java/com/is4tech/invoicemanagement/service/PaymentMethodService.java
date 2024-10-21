@@ -1,5 +1,7 @@
 package com.is4tech.invoicemanagement.service;
 
+import com.is4tech.invoicemanagement.model.Product;
+import com.is4tech.invoicemanagement.utils.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,8 @@ import com.is4tech.invoicemanagement.utils.MessagePage;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -45,6 +49,17 @@ public class PaymentMethodService {
             .currentPage(listAllPaymentMethod.getNumber())
             .pageSize(listAllPaymentMethod.getSize())
             .build();
+    }
+
+    public Message findAllPaymentMethods() {
+        List<PaymentMethod> listAllProducts = paymentMethodRepository.findAll();
+
+        Message message = new Message();
+
+        message.setNote("All Payment methods Retrieved Successfully");
+        message.setObject(listAllProducts.stream().map(this::toDto).toList());
+
+        return message;
     }
 
     public PaymentMethodDto findByIdPaymentMethodDto(Integer id, HttpServletRequest request){

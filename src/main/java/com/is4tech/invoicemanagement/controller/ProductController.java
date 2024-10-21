@@ -47,6 +47,19 @@ public class ProductController {
         return new ResponseEntity<>(message, HttpStatus.OK);
     }
 
+    @GetMapping("/show-all-products")
+    public ResponseEntity<Message> showAllProducts() {
+        Message listProducts = productService.findAllProducts();
+
+        return new ResponseEntity<>(
+                Message.builder()
+                        .note("Records found")
+                        .object(listProducts.getObject())
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
     @GetMapping("/show-by-id/{id}")
     public ResponseEntity<Message> showProductById(@PathVariable Integer id) {
         ProductDto productDto = productService.findByIdProduct(id);

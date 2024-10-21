@@ -1,8 +1,10 @@
 package com.is4tech.invoicemanagement.service;
 
 import com.is4tech.invoicemanagement.dto.ProductDto;
+import com.is4tech.invoicemanagement.model.Customer;
 import com.is4tech.invoicemanagement.model.Product;
 import com.is4tech.invoicemanagement.repository.ProductRepository;
+import com.is4tech.invoicemanagement.utils.Message;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,6 +20,17 @@ public class ProductService {
     public Page<ProductDto> findByAllProducts(Pageable pageable) {
         return productRepository.findAll(pageable)
                 .map(this::toDto);
+    }
+
+    public Message findAllProducts() {
+        List<Product> listAllProducts = productRepository.findAll();
+
+        Message message = new Message();
+
+        message.setNote("All Products Retrieved Successfully");
+        message.setObject(listAllProducts.stream().map(this::toDto).toList());
+
+        return message;
     }
 
     public ProductDto findByIdProduct(Integer id) {

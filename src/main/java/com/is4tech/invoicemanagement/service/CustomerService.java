@@ -1,5 +1,6 @@
 package com.is4tech.invoicemanagement.service;
 
+import com.is4tech.invoicemanagement.utils.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -14,6 +15,8 @@ import com.is4tech.invoicemanagement.utils.MessagePage;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+
+import java.util.List;
 
 @Service
 @AllArgsConstructor
@@ -44,6 +47,17 @@ public class CustomerService {
             .currentPage(listAllCustomer.getNumber())
             .pageSize(listAllCustomer.getSize())
             .build();
+    }
+
+    public Message findAllCustomers() {
+        List<Customer> listAllCustomers = customerRepository.findAll();
+
+        Message message = new Message();
+
+        message.setNote("All Customers Retrieved Successfully");
+        message.setObject(listAllCustomers.stream().map(this::toDto).toList());
+
+        return message;
     }
 
     public CustomerDto findByIdCustomer(Integer id, HttpServletRequest request){

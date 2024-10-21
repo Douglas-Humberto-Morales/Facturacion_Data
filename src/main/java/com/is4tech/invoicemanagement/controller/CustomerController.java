@@ -48,6 +48,19 @@ public class CustomerController {
                 HttpStatus.OK);
     }
 
+    @GetMapping("/show-all-customers")
+    public ResponseEntity<Message> showAllCustomer() {
+        Message listCustomer = customerService.findAllCustomers();
+
+        return new ResponseEntity<>(
+                Message.builder()
+                        .note("Records found")
+                        .object(listCustomer.getObject())
+                        .build(),
+                HttpStatus.OK
+        );
+    }
+
     @GetMapping("/show-by-id/{id}")
     public ResponseEntity<Message> showByIdCustomer (@PathVariable Integer id, HttpServletRequest request) {
         CustomerDto customerDto = customerService.findByIdCustomer(id, request);

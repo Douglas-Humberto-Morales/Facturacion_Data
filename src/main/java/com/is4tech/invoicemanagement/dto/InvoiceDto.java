@@ -23,6 +23,9 @@ public class InvoiceDto {
     @NotNull(message = "El total completo es obligatorio")
     private Double total;
 
+    @NotNull(message = "El total de impuestos es obligatorio")
+    private Double totalTaxes;
+
     @NotNull(message = "El metodo de pago es obligatorio")
     private Integer paymentMethodId;
 
