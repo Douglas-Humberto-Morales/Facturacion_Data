@@ -1,10 +1,16 @@
 package com.is4tech.invoicemanagement.service;
 
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.is4tech.invoicemanagement.dto.DetailInvoiceProductsDto;
+import com.is4tech.invoicemanagement.dto.InvoiceProductDetailDto;
 import com.is4tech.invoicemanagement.model.DetailInvoiceProducts;
 import com.is4tech.invoicemanagement.model.Invoice;
 import com.is4tech.invoicemanagement.repository.DetailInvoiceProductsRepository;
@@ -13,6 +19,12 @@ import com.is4tech.invoicemanagement.utils.MessagePage;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 @Service
 @AllArgsConstructor
@@ -40,6 +52,11 @@ public class DetailInvoiceProductsService {
         .orElseThrow(() -> new RuntimeException("Detail Invoice Products not found"));
     }
 
+    public List<DetailInvoiceProductsDto> findByIdInvoiceDetailInvoiceProducts(Integer id) {
+        return detailInvoiceProductsRepository.findByInvoice_InvoiceId(id).stream()
+        .map(this::toDto).toList();
+    }
+
     public boolean existDetailInvoiceProducts(Integer id) {
         return detailInvoiceProductsRepository.existsById(id);
     }
@@ -53,6 +70,22 @@ public class DetailInvoiceProductsService {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    public byte[] exportInvoiceReport(List<InvoiceProductDetailDto> productDetails) throws Exception {
+        InputStream reportStream = getClass().getResourceAsStream("/factura.jrxml");
+        JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(productDetails);
+        
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("subtotal", productDetails.get(0).getSubtotal());
+        parameters.put("total", productDetails.get(0).getTotal());
+        parameters.put("creation_date", productDetails.get(0).getCreationDate());
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+        
+        return JasperExportManager.exportReportToPdf(jasperPrint);
     }
 
     private DetailInvoiceProducts toModel(DetailInvoiceProductsDto detailInvoiceProductsDto) {

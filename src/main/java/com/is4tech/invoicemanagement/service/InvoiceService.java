@@ -1,18 +1,18 @@
 package com.is4tech.invoicemanagement.service;
 
-import com.is4tech.invoicemanagement.dto.*;
-import com.is4tech.invoicemanagement.exception.ResourceNorFoundException;
+import com.is4tech.invoicemanagement.dto.CustomerDto;
+import com.is4tech.invoicemanagement.dto.InvoiceDto;
+import com.is4tech.invoicemanagement.dto.PaymentMethodDto;
+import com.is4tech.invoicemanagement.dto.StatusInvoiceDto;
 import com.is4tech.invoicemanagement.model.Customer;
 import com.is4tech.invoicemanagement.model.Invoice;
 import com.is4tech.invoicemanagement.model.PaymentMethod;
 import com.is4tech.invoicemanagement.model.StatusInvoice;
 import com.is4tech.invoicemanagement.repository.InvoiceRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -61,38 +61,11 @@ public class InvoiceService {
                 .creationDate(invoice.getCreationDate())
                 .subtotal(invoice.getSubtotal())
                 .total(invoice.getTotal())
-                .totalTaxes(invoice.getTotalTaxes())
                 .paymentMethodId(invoice.getPaymentMethod().getPaymentMethodId())
                 .customer(invoice.getCustomer().getCustomerId())
                 .statusInvoiceId(invoice.getStatusInvoice().getStatusInvoiceId())
                 .userId(invoice.getUserId())
                 .build();
-    }
-
-    public Page<ReportDto> findReportByDateRangeAndFullName(LocalDate startDate, LocalDate endDate, String fullName, Pageable pageable) {
-        Page<Invoice> invoicesPage = invoiceRepository.findByDateRangeAndFullNameOptional(startDate, endDate, fullName, pageable);
-
-        if (invoicesPage.isEmpty()) {
-            throw new ResourceNorFoundException("No records found");
-        }
-
-        return invoicesPage.map(invoice -> ReportDto.builder()
-                .noOrdered(invoice.getInvoiceId())
-                .nameClient(invoice.getCustomer().getName())
-                .taxes(invoice.getTotalTaxes())
-                .total(invoice.getTotal())
-                .build());
-    }
-
-    public Page<ReportDto> findAllInvoicesAsReports(Pageable pageable) {
-        Page<Invoice> invoicesPage = invoiceRepository.findAll(pageable);
-
-        return invoicesPage.map(invoice -> ReportDto.builder()
-                .noOrdered(invoice.getInvoiceId())
-                .nameClient(invoice.getCustomer().getName())
-                .taxes(invoice.getTotalTaxes())
-                .total(invoice.getTotal())
-                .build());
     }
 
     private Invoice toModel(InvoiceDto invoiceDto, HttpServletRequest request){
@@ -107,7 +80,6 @@ public class InvoiceService {
                 .creationDate(invoiceDto.getCreationDate())
                 .subtotal(invoiceDto.getSubtotal())
                 .total(invoiceDto.getTotal())
-                .totalTaxes(invoiceDto.getTotalTaxes())
                 .paymentMethod(paymentMethod)
                 .customer(customer)
                 .statusInvoice(statusInvoice)

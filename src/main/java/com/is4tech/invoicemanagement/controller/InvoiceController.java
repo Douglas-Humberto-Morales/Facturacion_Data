@@ -1,18 +1,14 @@
 package com.is4tech.invoicemanagement.controller;
 
 import com.is4tech.invoicemanagement.dto.InvoiceDto;
-import com.is4tech.invoicemanagement.dto.InvoiceSearchDto;
-import com.is4tech.invoicemanagement.dto.ReportDto;
 import com.is4tech.invoicemanagement.exception.BadRequestException;
 import com.is4tech.invoicemanagement.exception.ResourceNorFoundException;
 import com.is4tech.invoicemanagement.service.InvoiceService;
 import com.is4tech.invoicemanagement.utils.JwtUtil;
 import com.is4tech.invoicemanagement.utils.Message;
-import com.is4tech.invoicemanagement.utils.MessagePage;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -103,43 +99,4 @@ public class InvoiceController {
             throw new BadRequestException("Error update record: " + exDt.getMessage());
         }
     }
-
-    @PostMapping("/reports-by-name")
-    public ResponseEntity<MessagePage> getReportsByDateRangeAndFullName(
-            @RequestBody InvoiceSearchDto reportSearchDto,
-            @PageableDefault(size = 10) Pageable pageable) {
-
-        Page<ReportDto> reportPage = invoiceService.findReportByDateRangeAndFullName(
-                reportSearchDto.getStartDate(),
-                reportSearchDto.getEndDate(),
-                reportSearchDto.getFullName(),
-                pageable);
-
-        return new ResponseEntity<>(MessagePage.builder()
-                .note("Records found")
-                .object(reportPage.getContent())
-                .totalElements((int) reportPage.getTotalElements())
-                .totalPages(reportPage.getTotalPages())
-                .currentPage(reportPage.getNumber())
-                .pageSize(reportPage.getSize())
-                .build(),
-                HttpStatus.OK);
-    }
-
-    @GetMapping("/invoices-reports")
-    public ResponseEntity<MessagePage> getAllInvoicesAsReports(@PageableDefault(size = 10) Pageable pageable) {
-
-        Page<ReportDto> reportPage = invoiceService.findAllInvoicesAsReports(pageable);
-
-        return new ResponseEntity<>(MessagePage.builder()
-                .note("Records found")
-                .object(reportPage.getContent())
-                .totalElements((int) reportPage.getTotalElements())
-                .totalPages(reportPage.getTotalPages())
-                .currentPage(reportPage.getNumber())
-                .pageSize(reportPage.getSize())
-                .build(),
-                HttpStatus.OK);
-    }
-
 }
