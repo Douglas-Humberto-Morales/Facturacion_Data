@@ -2,6 +2,8 @@ package com.is4tech.invoicemanagement.dto;
 
 import org.springframework.format.annotation.NumberFormat;
 
+import com.is4tech.invoicemanagement.model.Invoice;
+
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -33,5 +35,11 @@ public class DetailInvoiceProductsDto {
 
     @NotNull(message = "Invoice ID is required")
     private Integer invoiceId;
+
+
+    public Invoice orElseThrow(Object object) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'orElseThrow'");
+    }
 }
 

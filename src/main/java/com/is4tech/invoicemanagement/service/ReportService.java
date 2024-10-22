@@ -1,5 +1,9 @@
 package com.is4tech.invoicemanagement.service;
 
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,8 +17,19 @@ import com.is4tech.invoicemanagement.repository.CustomerRepository;
 import com.is4tech.invoicemanagement.repository.ReportRepository;
 import com.is4tech.invoicemanagement.utils.MessagePage;
 
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+
 
 @Service
 @AllArgsConstructor
@@ -52,6 +67,12 @@ public class ReportService {
     }
 
     @Transactional
+    public List<ReportDto> listAllReportNotPageable(){
+        return reportRepository.findAll().stream()
+            .map(this::toDtoReport).toList();
+    }
+
+    @Transactional
     public ReportDto findByIdReport(Integer id, HttpServletRequest request){
         ReportDto reportDto = reportRepository.findById(id)
             .map(this::toDtoReport)
@@ -81,6 +102,24 @@ public class ReportService {
             //auditService.logAudit(reportDto, this.getClass().getMethods()[0], e, statusCode, NAME_ENTITY, request);
             throw e;
       }
+    }
+
+    public byte[] exportReport(List<ReportDto> reportList) throws Exception {
+        InputStream reportStream = this.getClass().getResourceAsStream("/report_template.jrxml");
+
+        JasperReport jasperReport = JasperCompileManager.compileReport(reportStream);
+
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(reportList);
+
+        Map<String, Object> parameters = new HashMap<>();
+        parameters.put("createdBy", "Douglas' Application");
+
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, parameters, dataSource);
+
+        ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream();
+        JasperExportManager.exportReportToPdfStream(jasperPrint, pdfOutputStream);
+
+        return pdfOutputStream.toByteArray();
     }
 
     private ReportDto toDtoReport(Report report){
